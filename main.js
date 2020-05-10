@@ -165,7 +165,7 @@ function diffContent(data, fetch_data) {
   const new_search = new_root.querySelector('#MainContent_Contents_divSearch').outerHTML;
   const new_data = new_root.querySelector('#main').outerHTML.replace(new_search, '');
 
-  result = diff.diffLines(old_data, new_data);
+  result = diff.diffLines(old_data.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace('&nbsp', ' ').replace('&gt', '＞').replace('&lt', '＜'), new_data.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace('&nbsp', ' ').replace('&gt', '＞').replace('&lt', '＜'));
 
   let diffs = [];
   result.forEach(item => {
@@ -198,6 +198,7 @@ function postErrDiscord(content) {
         resolve();
       })
       .catch(err => {
+        console.log('Discord送信中にエラーが発生しました');
         reject(err);
       })
   })
@@ -227,6 +228,7 @@ function postDiscord(contents) {
       'Content-type': 'application/json',
     }
   }
+  console.log(tmp.embeds[0].fields);
   return new Promise((resolve, reject) => {
     axios.post(process.env.WEBHOOK, tmp, config)
       .then(res => {
@@ -234,6 +236,7 @@ function postDiscord(contents) {
         resolve();
       })
       .catch(err => {
+        console.log('Discord送信中にエラーが発生しました');
         reject(err);
       })
   })
