@@ -27,7 +27,7 @@ async function main() {
     .then(() => {
       console.log('ログインに成功しました。情報の取得に入ります。');
     })
-    .catch(() => {
+    .catch(async () => {
       console.log('ログインに失敗しました。ポータルサイトが落ちている可能性があります。');
       await postErrDiscord('ログインに失敗しました。ポータルサイトが落ちている可能性があります。');
       process.exit(1);
