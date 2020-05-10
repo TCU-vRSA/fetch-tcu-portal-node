@@ -4,5 +4,11 @@
   "main": "main.js",
   "repository": "https://github.com/TCU-vRSA/fetch-tcu-portal-node",
   "author": "920oj",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "diff": "^4.0.2",
+    "dotenv": "^8.2.0",
+    "node-html-parser": "^1.2.16"
+  }
 }
