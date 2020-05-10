@@ -8,6 +8,12 @@ const diff = require('diff');
 async function main() {
   console.log('TCUポータル更新差分取得bot by TCU-vRSA');
   console.log('現在時間:' + new Date(Date.now()));
+
+  // 一次保存先フォルダがなければdlフォルダを作る
+  if (!fs.existsSync('./dl/')) {
+    fs.mkdirSync('./dl/');
+  };
+
   console.log('認証に必要な情報を取得します...');
   const info = await getLoginInfo().catch(() => {return false});
   if(!info) {
@@ -32,8 +38,9 @@ async function main() {
     process.exit(1);
   } else {
     console.log('お知らせページを取得しました。差分チェックに入ります...');
-    console.log(fetch_data);
   }
+
+  await judgeContent(fetch_data);
   
 }
 
@@ -135,9 +142,9 @@ function judgeContent(fetch_data) {
       else {
         const diffs = diffContent(data, fetch_data);
         if(diffs.length) {
-          await postDiscord(url_list[item], diffs);
+          await postDiscord(diffs);
         } else {
-          console.log(`${url_list[item]} の変更点はありませんでした。`);
+          console.log(`変更点はありませんでした。`);
         }
         fs.writeFile(path + 'old.txt', fetch_data, 'utf-8', err => {
           if(err) { throw err; };
@@ -145,6 +152,65 @@ function judgeContent(fetch_data) {
         resolve();
       }
     });
+  })
+}
+
+function diffContent(data, fetch_data) {
+  const old_root = htmlParser.parse(data);
+  const old_search = old_root.querySelector('#MainContent_Contents_divSearch').outerHTML;
+  const old_data = old_root.querySelector('#main').outerHTML.replace(old_search, '');
+
+  const new_root = htmlParser.parse(fetch_data);
+  const new_search = new_root.querySelector('#MainContent_Contents_divSearch').outerHTML;
+  const new_data = new_root.querySelector('#main').outerHTML.replace(new_search, '');
+
+  result = diff.diffLines(old_data, new_data);
+
+  let diffs = [];
+  result.forEach(item => {
+    if(item.added) {
+      diffs.push('追記: ' + item.value);
+    }
+    else if(item.removed) {
+      diffs.push('削除: ' + item.value);
+    }
+  });
+  return diffs;
+}
+
+function postDiscord(contents) {
+  const tmp = {
+    "username": "TCU変更通知Bot(Node版)",
+    "avatar_url": "https://pbs.twimg.com/profile_images/1250820091018539008/4uztlH6f_400x400.jpg",
+    "content": `ポータルサイトのお知らせに変更がありました。`,
+    "embeds": [
+      {
+        "fields": []
+      }
+    ]
+  };
+  contents.forEach(item => {
+    const t = {
+      "name": "変更点",
+      "value": item
+    }
+    tmp.embeds[0].fields.push(t);
+  })
+  const config = {
+    headers: {
+      'Accept': 'application/json',
+      'Content-type': 'application/json',
+    }
+  }
+  return new Promise((resolve, reject) => {
+    axios.post(process.env.WEBHOOK, tmp, config)
+      .then(res => {
+        console.log('変更点をDiscordに送信しました。');
+        resolve();
+      })
+      .catch(err => {
+        reject(err);
+      })
   })
 }
 
