@@ -9,7 +9,6 @@ async function main() {
   console.log('TCUポータル更新差分取得bot by TCU-vRSA');
   console.log('現在時間:' + new Date(Date.now()));
 
-  // 一次保存先フォルダがなければdlフォルダを作る
   if (!fs.existsSync('./dl/')) {
     fs.mkdirSync('./dl/');
   };
@@ -18,6 +17,7 @@ async function main() {
   const info = await getLoginInfo().catch(() => {return false});
   if(!info) {
     console.log('認証に必要な情報を取得することが出来ませんでした。ポータルサイトが落ちている可能性があります。');
+    await postErrDiscord('認証に必要な情報を取得することが出来ませんでした。ポータルサイトが落ちている可能性があります。');
     process.exit(1);
   } else {
     console.log('認証に必要な情報を取得しました。ログイン処理に移ります...');
@@ -29,19 +29,20 @@ async function main() {
     })
     .catch(() => {
       console.log('ログインに失敗しました。ポータルサイトが落ちている可能性があります。');
+      await postErrDiscord('ログインに失敗しました。ポータルサイトが落ちている可能性があります。');
       process.exit(1);
     });
   
   const fetch_data = await getAuthenticatedPage(info['SESSION_ID'], 'https://portal.off.tcu.ac.jp/Portal/Osr/Osr0100.aspx?cId=g1871020&ct=1').catch(() => {return false});
   if(!fetch_data) {
     console.log('ページのダウンロードに失敗しました。');
+    await postErrDiscord('ページのダウンロードに失敗しました。ポータルサイトが落ちている可能性があります。');
     process.exit(1);
   } else {
     console.log('お知らせページを取得しました。差分チェックに入ります...');
   }
 
   await judgeContent(fetch_data);
-  
 }
 
 function getLoginInfo() {
@@ -176,6 +177,30 @@ function diffContent(data, fetch_data) {
     }
   });
   return diffs;
+}
+
+function postErrDiscord(content) {
+  const tmp = {
+    "username": "TCU変更通知Bot(Node版)",
+    "avatar_url": "https://pbs.twimg.com/profile_images/1250820091018539008/4uztlH6f_400x400.jpg",
+    "content": `${content}`,
+  };
+  const config = {
+    headers: {
+      'Accept': 'application/json',
+      'Content-type': 'application/json',
+    }
+  }
+  return new Promise((resolve, reject) => {
+    axios.post(process.env.WEBHOOK, tmp, config)
+      .then(res => {
+        console.log('Discordに送信しました。');
+        resolve();
+      })
+      .catch(err => {
+        reject(err);
+      })
+  })
 }
 
 function postDiscord(contents) {
