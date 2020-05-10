@@ -4,5 +4,8 @@
   "main": "main.js",
   "repository": "https://github.com/TCU-vRSA/fetch-tcu-portal-node",
   "author": "920oj",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^8.2.0"
+  }
 }
