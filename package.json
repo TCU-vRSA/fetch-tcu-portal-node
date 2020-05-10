@@ -1,0 +1,8 @@
+{
+  "name": "fetch-tcu-portal-node",
+  "version": "1.0.0",
+  "main": "main.js",
+  "repository": "https://github.com/TCU-vRSA/fetch-tcu-portal-node",
+  "author": "920oj",
+  "license": "MIT"
+}
