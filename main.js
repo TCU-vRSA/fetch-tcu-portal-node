@@ -170,11 +170,12 @@ function diffContent(data, fetch_data) {
   let diffs = [];
   result.forEach(item => {
     if(item.added) {
-      diffs.push('追記: ' + item.value.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace(/\r?\n/g,'').replace('&nbsp;', '').replace('&lt;', '').replace('&gt;', ''));
+      diffs.push('追記: ' + item.value.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace(/\r?\n/g,'').replace('&nbsp;', '').replace('&lt;', '').replace('&gt;', '').trim());
     }
-    else if(item.removed) {
-      diffs.push('削除: ' + item.value.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace(/\r?\n/g,'').replace('&nbsp;', '').replace('&lt;', '').replace('&gt;', ''));
-    }
+    // ポータルサイトの場合は削除は要らない？
+    // else if(item.removed) {
+    //   diffs.push('削除: ' + item.value.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace(/\r?\n/g,'').replace('&nbsp;', '').replace('&lt;', '').replace('&gt;', '').trim());
+    // }
   });
   return diffs;
 }
