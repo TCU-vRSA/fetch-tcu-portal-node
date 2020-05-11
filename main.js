@@ -165,7 +165,7 @@ function diffContent(data, fetch_data) {
   const new_search = new_root.querySelector('#MainContent_Contents_divSearch').outerHTML;
   const new_data = new_root.querySelector('#main').outerHTML.replace(new_search, '');
 
-  result = diff.diffLines(old_data.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace('&nbsp', ' ').replace('&gt', '＞').replace('&lt', '＜'), new_data.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace('&nbsp', ' ').replace('&gt', '＞').replace('&lt', '＜'));
+  result = diff.diffLines(old_data.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace('&nbsp', '').replace('&gt', '＞').replace('&lt', '＜').replace(' ', '').replace('\n', ''), new_data.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace('&nbsp', '').replace('&gt', '＞').replace('&lt', '＜').replace(' ', '').replace('\n', ''));
 
   let diffs = [];
   result.forEach(item => {
