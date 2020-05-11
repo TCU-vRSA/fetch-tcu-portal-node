@@ -143,7 +143,12 @@ function judgeContent(fetch_data) {
       else {
         const diffs = diffContent(data, fetch_data);
         if(diffs.length) {
-          await postDiscord(diffs);
+          await postDiscord(diffs).catch(async (err) => {
+            console.log('Discord送信中にエラーが発生しました。');
+            if(err.response.status === 400) {
+              await postErrDiscord('ポータルサイトに何らかの変更があります。文字数が多いため、内容を送信できませんでした。');
+            }
+          });
         } else {
           console.log(`変更点はありませんでした。`);
         }
@@ -170,11 +175,12 @@ function diffContent(data, fetch_data) {
   let diffs = [];
   result.forEach(item => {
     if(item.added) {
-      diffs.push('追記: ' + item.value.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace(/\r?\n/g,'').replace('&nbsp;', '').replace('&lt;', '').replace('&gt;', ''));
+      diffs.push('追記: ' + item.value.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace(/\r?\n/g,'').replace('&nbsp;', '').replace('&lt;', '').replace('&gt;', '').trim());
     }
-    else if(item.removed) {
-      diffs.push('削除: ' + item.value.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace(/\r?\n/g,'').replace('&nbsp;', '').replace('&lt;', '').replace('&gt;', ''));
-    }
+    // ポータルサイトの場合は削除は要らない？
+    // else if(item.removed) {
+    //   diffs.push('削除: ' + item.value.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace(/\r?\n/g,'').replace('&nbsp;', '').replace('&lt;', '').replace('&gt;', '').trim());
+    // }
   });
   return diffs;
 }
@@ -228,7 +234,6 @@ function postDiscord(contents) {
       'Content-type': 'application/json',
     }
   }
-  console.log(tmp.embeds[0].fields);
   return new Promise((resolve, reject) => {
     axios.post(process.env.WEBHOOK, tmp, config)
       .then(res => {
