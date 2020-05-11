@@ -165,15 +165,15 @@ function diffContent(data, fetch_data) {
   const new_search = new_root.querySelector('#MainContent_Contents_divSearch').outerHTML;
   const new_data = new_root.querySelector('#main').outerHTML.replace(new_search, '');
 
-  result = diff.diffLines(old_data.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace('&nbsp', '').replace('&gt', '＞').replace('&lt', '＜').replace(' ', '').replace('\n', ''), new_data.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace('&nbsp', '').replace('&gt', '＞').replace('&lt', '＜').replace(' ', '').replace('\n', ''));
+  result = diff.diffLines(old_data, new_data);
 
   let diffs = [];
   result.forEach(item => {
     if(item.added) {
-      diffs.push('追記: ' + item.value);
+      diffs.push('追記: ' + item.value.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace(/\r?\n/g,'').replace('&nbsp;', '').replace('&lt;', '').replace('&gt;', ''));
     }
     else if(item.removed) {
-      diffs.push('削除: ' + item.value);
+      diffs.push('削除: ' + item.value.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'').replace(/\r?\n/g,'').replace('&nbsp;', '').replace('&lt;', '').replace('&gt;', ''));
     }
   });
   return diffs;

@@ -1,3 +1,4 @@
 node_modules/
 .env
 dl/
+main.sh
