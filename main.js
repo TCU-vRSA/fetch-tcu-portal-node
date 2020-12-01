@@ -33,7 +33,7 @@ async function main() {
       process.exit(1);
     });
   
-  const fetch_data = await getAuthenticatedPage(info['SESSION_ID'], 'https://portal.off.tcu.ac.jp/Portal/Osr/Osr0100.aspx?cId=g1871020&ct=1').catch(() => {return false});
+  const fetch_data = await getAuthenticatedPage(info['SESSION_ID'], `https://portal.off.tcu.ac.jp/Portal/Osr/Osr0100.aspx?cId=${process.env.ID}&ct=1`).catch(() => {return false});
   if(!fetch_data) {
     console.log('ページのダウンロードに失敗しました。');
     await postErrDiscord('ページのダウンロードに失敗しました。ポータルサイトが落ちている可能性があります。');
