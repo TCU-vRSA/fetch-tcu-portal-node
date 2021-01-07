@@ -6,7 +6,7 @@
   "author": "920oj",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "diff": "^4.0.2",
     "dotenv": "^8.2.0",
     "node-html-parser": "^1.2.16"
